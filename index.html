@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premanand Maharaj AI Chat</title>
+</head>
+<body>
+    <h2>Ask Premanand Maharaj AI</h2>
+    <textarea id="question" placeholder="अपना प्रश्न यहाँ टाइप करें..."></textarea>
+    <button onclick="askAI()">पूछें</button>
+    <p id="answer"></p>
+
+    <script>
+        async function askAI() {
+            const question = document.getElementById('question').value;
+            const answerElement = document.getElementById('answer');
+
+            if (!question.trim()) {
+                answerElement.innerText = "कृपया एक प्रश्न दर्ज करें!";
+                return;
+            }
+
+            answerElement.innerText = "उत्तर आ रहा है...";
+
+            try {
+                const response = await fetch('http://localhost:5000/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question })
+                });
+
+                const data = await response.json();
+                console.log("Server Response:", data); // Debugging
+
+                if (data.answer) {
+                    answerElement.innerText = data.answer; // Show answer
+                } else {
+                    answerElement.innerText = "कोई उत्तर नहीं मिला। कृपया पुनः प्रयास करें।";
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                answerElement.innerText = "कुछ गलत हुआ। कृपया सर्वर जांचें।";
+            }
+        }
+    </script>
+</body>
+</html>
