@@ -1,48 +1,94 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premanand Maharaj AI Chat</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Premanand Maharaj AI Chat</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h2>Ask Premanand Maharaj AI</h2>
-    <textarea id="question" placeholder="अपना प्रश्न यहाँ टाइप करें..."></textarea>
-    <button onclick="askAI()">पूछें</button>
-    <p id="answer"></p>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center px-4">
+  <div class="bg-white shadow-xl rounded-2xl p-6 max-w-xl w-full space-y-4">
+    <h1 class="text-2xl font-bold text-center text-indigo-700">🕉️ प्रेमानंद महाराज AI संवाद</h1>
+    <h2 class="text-lg text-gray-600 text-center">Premanand Maharaj AI Discussion</h2>
 
-    <script>
-        async function askAI() {
-            const question = document.getElementById('question').value;
-            const answerElement = document.getElementById('answer');
+    <textarea
+      id="question"
+      rows="4"
+      placeholder="अपना प्रश्न यहाँ टाइप करें... (Type your question here...)"
+      class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
+    ></textarea>
 
-            if (!question.trim()) {
-                answerElement.innerText = "कृपया एक प्रश्न दर्ज करें!";
-                return;
-            }
+    <button
+      onclick="askAI()"
+      class="w-full bg-indigo-600 text-white font-semibold py-2 rounded-lg hover:bg-indigo-700 transition"
+    >
+      पूछें (Ask)
+    </button>
 
-            answerElement.innerText = "उत्तर आ रहा है...";
+    <div
+      id="answer"
+      class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 min-h-[60px] text-gray-800"
+    >
+      <!-- Answer will appear here -->
+    </div>
+    
+    <div
+      id="english-answer"
+      class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 min-h-[60px] text-gray-600 italic"
+    >
+      <!-- English Translation will appear here -->
+    </div>
+  </div>
 
-            try {
-                const response = await fetch('https://mynodeserver-ivk5.onrender.com/ask', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question })
-                });
+  <script>
+    async function askAI() {
+      const question = document.getElementById('question').value;
+      const answerElement = document.getElementById('answer');
+      const englishAnswerElement = document.getElementById('english-answer');
 
-                const data = await response.json();
-                console.log("Server Response:", data); // Debugging
+      if (!question.trim()) {
+        answerElement.innerText = "कृपया एक प्रश्न दर्ज करें!";
+        englishAnswerElement.innerText = "Please enter a question!";
+        return;
+      }
 
-                if (data.answer) {
-                    answerElement.innerText = data.answer; // Show answer
-                } else {
-                    answerElement.innerText = "कोई उत्तर नहीं मिला। कृपया पुनः प्रयास करें।";
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                answerElement.innerText = "कुछ गलत हुआ। कृपया सर्वर जांचें।";
-            }
+      answerElement.innerText = "उत्तर आ रहा है...";
+      englishAnswerElement.innerText = "Fetching response...";
+
+      try {
+        const response = await fetch('https://mynodeserver-ivk5.onrender.com', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question })
+        });
+
+        const data = await response.json();
+        console.log("Server Response:", data);
+
+        if (data.answer) {
+          answerElement.innerText = `🕉️ हिंदी उत्तर: ${data.answer}`;
+          const englishTranslation = await translateToEnglish(data.answer);
+          englishAnswerElement.innerText = `🔹 English Translation: ${englishTranslation}`;
+        } else {
+          answerElement.innerText = "कोई उत्तर नहीं मिला। कृपया पुनः प्रयास करें।";
+          englishAnswerElement.innerText = "No answer received. Please try again.";
         }
-    </script>
+      } catch (error) {
+        console.error("Error:", error);
+        answerElement.innerText = "❌ कुछ गलत हुआ। कृपया सर्वर जांचें।";
+        englishAnswerElement.innerText = "❌ Something went wrong. Please check the server.";
+      }
+    }
+
+    async function translateToEnglish(hindiText) {
+      try {
+        const response = await fetch('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(hindiText) + '&langpair=hi|en');
+        const data = await response.json();
+        return data.responseData.translatedText || "Translation unavailable.";
+      } catch {
+        return "Translation service failed.";
+      }
+    }
+  </script>
 </body>
 </html>
