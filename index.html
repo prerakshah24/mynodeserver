@@ -2,14 +2,25 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Premanand Maharaj AI Chat</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center px-4">
   <div class="bg-white shadow-xl rounded-2xl p-6 max-w-xl w-full space-y-4">
-    <h1 class="text-2xl font-bold text-center text-indigo-700">🕉️ प्रेमानंद महाराज AI संवाद</h1>
-    <h2 class="text-lg text-gray-600 text-center">Premanand Maharaj AI Discussion</h2>
+    <div class="flex justify-center">
+      <img src="./prem_ai.jpeg" alt="Premanand Maharaj" class="w-32 h-32 rounded-full shadow-md ring-4 ring-yellow-300 object-cover"/>
+    </div>
+
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-bold text-indigo-700">🕉️ प्रेमानंद महाराज AI</h1>
+      <button onclick="speakWelcome()" class="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-4 py-1 rounded-lg text-sm transition">
+        🎤 सुनें (Listen)
+      </button>
+    </div>
+    
+    
+    <h2 class="text-md text-gray-600 text-center">Premanand Maharaj AI Discussion</h2>
 
     <textarea
       id="question"
@@ -25,18 +36,12 @@
       पूछें (Ask)
     </button>
 
-    <div
-      id="answer"
-      class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 min-h-[60px] text-gray-800"
-    >
-      <!-- Answer will appear here -->
+    <div id="answer" class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 min-h-[60px] text-gray-800">
+      <!-- Hindi Answer -->
     </div>
     
-    <div
-      id="english-answer"
-      class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 min-h-[60px] text-gray-600 italic"
-    >
-      <!-- English Translation will appear here -->
+    <div id="english-answer" class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 min-h-[60px] text-gray-600 italic">
+      <!-- English Translation -->
     </div>
   </div>
 
@@ -67,6 +72,8 @@
 
         if (data.answer) {
           answerElement.innerText = `🕉️ हिंदी उत्तर: ${data.answer}`;
+          speakHindi(data.answer);
+
           const englishTranslation = await translateToEnglish(data.answer);
           englishAnswerElement.innerText = `🔹 English Translation: ${englishTranslation}`;
         } else {
@@ -88,6 +95,27 @@
       } catch {
         return "Translation service failed.";
       }
+    }
+
+    function speakWelcome() {
+      const welcomeText = " स्वागत है! प्रेमानंद महाराज एआई में आपका हार्दिक स्वागत है।";
+      speakHindi(welcomeText);
+    }
+
+    function speakHindi(text) {
+      if (!window.speechSynthesis) {
+        alert("Voice not supported in this browser.");
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'hi-IN';
+      utterance.rate = 0.95;
+
+      console.log("Speaking:", text);
+
+      speechSynthesis.cancel(); // Stop any current speech
+      speechSynthesis.speak(utterance);
     }
   </script>
 </body>
