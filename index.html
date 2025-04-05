@@ -56,7 +56,7 @@
       englishAnswerElement.innerText = "Fetching response...";
 
       try {
-        const response = await fetch('https://mynodeserver-ivk5.onrender.com', {
+        const response = await fetch('https://mynodeserver-ivk5.onrender.com/ask', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ question })
